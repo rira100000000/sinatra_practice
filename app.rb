@@ -70,7 +70,7 @@ delete '/memos/delete/:id' do
 		info_id, info_title = file_info.split(',')
 		if info_id == @id
 			info_title.gsub!("\n", '')
-			replace_line("#{current_dir}/file_infos.txt", index - 1, "#{info_id},#{info_title},true\n")
+			replace_line("#{current_dir}/file_infos.txt", index, "#{info_id},#{info_title},true\n")
 			break
 		end
 	end
