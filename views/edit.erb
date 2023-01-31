@@ -7,11 +7,11 @@
 <body>
   <form method='post' action="/memos/update/<%= @id %>">
   <label for='title'>タイトル</label><br>
-  <input type='text' id='title' name='title' value=<%= @title %>><br>
-  <label for='title'>本文</label><br>
-  <input type='text' id='content' name='content' value=<%= @content %>><br>
+  <input type='text' id='title' name='title' value="<%= @title %>"><br>
+  <label for='content'>本文</label><br>
+  <input type='text' id='content' name='content' value="<%= @content %>"><br>
   <input type='submit' value='変更'>
-  <input type='hidden' id='id' name='id' value=<%= @id %>>
+  <input type='hidden' id='id' name='id' value="<%= @id %>">
   <input type='hidden' id="hidden" name="_method" value="patch">
   </form>
 </body>

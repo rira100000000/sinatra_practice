@@ -6,11 +6,11 @@
 </head>
 <body>
   <a href='http://localhost:4567/memos/new'>新規作成</a><br>
-  <% unless @files.nil?%>
+  <% unless @files.nil? %>
     <% @files.each do |file| %>
       <% id, title, delete_flag = file.split(',') %>
       <% unless delete_flag == "true\n" %>
-        <a href=<%= "http://localhost:4567/memos/show/#{id}" %>> <%= title %> </a><br>
+        <a href="<%= "http://localhost:4567/memos/show/#{id}" %>"> <%= title %> </a><br>
       <% end %>
     <% end %>
   <% end %>
