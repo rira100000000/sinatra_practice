@@ -1,24 +1,14 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="utf-8">
-  <title><%= @title %></title>
-</head>
-<body>
-  <a href="http://localhost:4567/memos">戻る</a>
-
-  <h1>タイトル</h1>
-  <%= @title %>
-  <h1>本文</h1>
-  <p>
-    <%= @content %>
-  </p>
-  <dev class=menu>
-    <a href="http://localhost:4567/memos/<%= @id %>/edit">変更</a>
-    <form action="/memos/<%= @id %>/delete" method="post">
-      <input type="hidden" name="_method" value="delete">
-      <input type="submit" value="Delete">
-    </form>
-  </dev>
-</body>
-</html>
+<a href="http://localhost:4567/memos">戻る</a>
+<h1>タイトル</h1>
+<%= @title %>
+<h1>本文</h1>
+<p>
+  <%= @content %>
+</p>
+<dev class=menu>
+  <a href="http://localhost:4567/memos/<%= @id %>/edit">変更</a>
+  <form action="/memos/<%= @id %>/delete" method="post">
+    <input type="hidden" name="_method" value="delete">
+    <input type="submit" value="Delete">
+  </form>
+</dev>

@@ -5,6 +5,7 @@ require 'sinatra/reloader'
 
 enable :method_override
 get %r{/memos/?} do
+  @page_title = 'メモ一覧'
   if File.exist?('file_infos.txt')
     @files = IO.readlines('file_infos.txt')
   else
@@ -15,6 +16,7 @@ get %r{/memos/?} do
 end
 
 get '/memos/new' do
+  @page_title = '新規作成'
   erb :new
 end
 
@@ -54,6 +56,7 @@ end
 get '/memos/:id/show' do
   current_dir = Dir.pwd
   @id, @title = *fetch_id_and_title
+  @page_title = @title
   @content = File.read("#{current_dir}/data/#{@id}")
   erb :show
 end
@@ -61,6 +64,7 @@ end
 get '/memos/:id/edit' do
   current_dir = Dir.pwd
   @id, @title = *fetch_id_and_title
+  @page_title = "#{@title}-編集"
   @content = File.read("#{current_dir}/data/#{@id}")
   erb :edit
 end
@@ -79,6 +83,11 @@ delete '/memos/:id/delete' do
     next
   end
   redirect 'http://localhost:4567/memos'
+end
+
+not_found do
+  @page_title = '404 お探しのページは存在しません'
+  '404 お探しのページは存在しません'
 end
 
 def fetch_id_and_title
