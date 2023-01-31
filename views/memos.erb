@@ -10,7 +10,7 @@
     <% @files.each do |file| %>
       <% id, title, delete_flag = file.split(',') %>
       <% unless delete_flag == "true\n" %>
-        <a href="<%= "http://localhost:4567/memos/show/#{id}" %>"> <%= title %> </a><br>
+        <a href="<%= "http://localhost:4567/memos/#{id}/show" %>"> <%= title %> </a><br>
       <% end %>
     <% end %>
   <% end %>

@@ -29,10 +29,10 @@ post '/memos/create' do
   new_file = File.new("#{current_dir}/data/#{@id}", 'w')
   new_file.puts(@content)
   new_file.close
-  redirect "http://localhost:4567/memos/show/#{@id}"
+  redirect "http://localhost:4567/memos/#{@id}/show"
 end
 
-patch '/memos/update/:id' do
+patch '/memos/:id/update' do
   @title = params[:title]
   @content = params[:content]
   @id = params[:id]
@@ -48,27 +48,27 @@ patch '/memos/update/:id' do
   file = File.open("#{current_dir}/data/#{@id}", 'w')
   file.puts(@content)
   file.close
-  redirect "http://localhost:4567/memos/show/#{@id}"
+  redirect "http://localhost:4567/memos/#{@id}/show"
 end
 
-get '/memos/show/*' do
+get '/memos/:id/show' do
   current_dir = Dir.pwd
-  @id, @title = *fetch_id_and_title('show')
+  @id, @title = *fetch_id_and_title
   @content = File.read("#{current_dir}/data/#{@id}")
   erb :show
 end
 
-get '/memos/edit/*' do
+get '/memos/:id/edit' do
   current_dir = Dir.pwd
-  @id, @title = *fetch_id_and_title('edit')
+  @id, @title = *fetch_id_and_title
   @content = File.read("#{current_dir}/data/#{@id}")
   erb :edit
 end
 
-delete '/memos/delete/:id' do
+delete '/memos/:id/delete' do
   current_dir = Dir.pwd
   file_infos = IO.readlines('file_infos.txt')
-  @id, @title = *fetch_id_and_title('delete')
+  @id, @title = *fetch_id_and_title
   file_infos.each_with_index do |file_info, index|
     info_id, info_title = file_info.split(',')
     if info_id == @id
@@ -81,12 +81,12 @@ delete '/memos/delete/:id' do
   redirect 'http://localhost:4567/memos'
 end
 
-def fetch_id_and_title(order)
-  id = request.url.gsub("http://localhost:4567/memos/#{order}/", '')
+def fetch_id_and_title
+  id = request.url.match("(?<=memos\/).*(?=\/)")
   file_infos = IO.readlines('file_infos.txt')
   file_infos.each do |file_info|
     info_id, info_title = file_info.split(',')
-    return [info_id, info_title] if info_id == id
+    return [info_id, info_title] if info_id == id.to_s
   end
 end
 

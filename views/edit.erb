@@ -5,7 +5,7 @@
   <title><% @title %></title>
 </head>
 <body>
-  <form method='post' action="/memos/update/<%= @id %>">
+  <form method='post' action="/memos/<%= @id %>/update">
   <label for='title'>タイトル</label><br>
   <input type='text' id='title' name='title' value="<%= @title %>"><br>
   <label for='content'>本文</label><br>

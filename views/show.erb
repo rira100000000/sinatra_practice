@@ -14,8 +14,8 @@
     <%= @content %>
   </p>
   <dev class=menu>
-    <a href="http://localhost:4567/memos/edit/<%= @id %>">変更</a>
-    <form action="/memos/delete/<%= @id %>" method="post">
+    <a href="http://localhost:4567/memos/<%= @id %>/edit">変更</a>
+    <form action="/memos/<%= @id %>/delete" method="post">
       <input type="hidden" name="_method" value="delete">
       <input type="submit" value="Delete">
     </form>
