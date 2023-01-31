@@ -19,8 +19,8 @@ get '/memos/new' do
 end
 
 post '/memos/create' do
-  @title = params[:title]
-  @content = params[:content]
+  @title = protect_xss(params[:title])
+  @content = protect_xss(params[:content])
   @id = File.read('file_infos.txt').count("\n")
   files = File.open('file_infos.txt', 'a')
   files.puts("#{@id},#{@title}")
@@ -33,8 +33,8 @@ post '/memos/create' do
 end
 
 patch '/memos/:id/update' do
-  @title = params[:title]
-  @content = params[:content]
+  @title = protect_xss(params[:title])
+  @content = protect_xss(params[:content])
   @id = params[:id]
   current_dir = Dir.pwd
   file_infos = IO.readlines('file_infos.txt')
@@ -96,4 +96,8 @@ def replace_line(file_name, line_num, new_line)
   file = File.open(file_name, 'w')
   file.puts(lines.join)
   file.close
+end
+
+def protect_xss(text)
+  Rack::Utils.escape_html(text)
 end
