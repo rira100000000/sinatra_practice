@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang='ja'>
 <head>
-  <link rel="stylesheet" href="./memo.css" />
+  <link rel="stylesheet" href="/memo.css">
   <meta charset='utf-8'>
   <title><%= @page_title %></title>
 </head>
 <body>
-  <%= yield %>
+<header>rira's memo app</header>
+  <div class=container>
+    <%= yield %>
+  </div>
 </body>
 </html>

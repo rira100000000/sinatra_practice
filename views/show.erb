@@ -1,14 +1,14 @@
+<div class=mid_box>
 <a href="http://localhost:4567/memos">戻る</a>
-<h1>タイトル</h1>
-<%= @title %>
-<h1>本文</h1>
-<p>
-  <%= @content %>
-</p>
-<dev class=menu>
-  <a href="http://localhost:4567/memos/<%= @id %>/edit">変更</a>
-  <form action="/memos/<%= @id %>/delete" method="post">
-    <input type="hidden" name="_method" value="delete">
-    <input type="submit" value="Delete">
-  </form>
-</dev>
+  <div class=title_area>
+    <p class=title><%= @title %></p>
+  </div>
+  <p class=display_new_line><%= @content %></p>
+  <div class=menu>
+    <a href="http://localhost:4567/memos/<%= @id %>/edit" class=button>Edit</a>
+    <form action="/memos/<%= @id %>/delete" method="post">
+      <input type="hidden" name="_method" value="delete">
+      <input type="submit" value="Delete" class="button">
+    </form>
+  </div>
+<div>
