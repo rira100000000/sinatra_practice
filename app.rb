@@ -28,7 +28,7 @@ post '/memos/create' do
   files.puts("#{@id},#{@title}")
   files.close
   current_dir = Dir.pwd
-  new_file = File.new("#{current_dir}/data/#{@id}", 'w')
+  new_file = File.new("#{current_dir}/data/#{@id}.txt", 'w')
   new_file.puts(@content)
   new_file.close
   redirect "http://localhost:4567/memos/#{@id}/show"
@@ -47,7 +47,7 @@ patch '/memos/:id/update' do
       break
     end
   end
-  file = File.open("#{current_dir}/data/#{@id}", 'w')
+  file = File.open("#{current_dir}/data/#{@id}.txt", 'w')
   file.puts(@content)
   file.close
   redirect "http://localhost:4567/memos/#{@id}/show"
@@ -57,7 +57,7 @@ get '/memos/:id/show' do
   current_dir = Dir.pwd
   @id, @title = *fetch_id_and_title
   @page_title = @title
-  @content = File.read("#{current_dir}/data/#{@id}")
+  @content = File.read("#{current_dir}/data/#{@id}.txt")
   erb :show
 end
 
@@ -65,7 +65,7 @@ get '/memos/:id/edit' do
   current_dir = Dir.pwd
   @id, @title = *fetch_id_and_title
   @page_title = "#{@title}-編集"
-  @content = File.read("#{current_dir}/data/#{@id}")
+  @content = File.read("#{current_dir}/data/#{@id}.txt")
   erb :edit
 end
 
