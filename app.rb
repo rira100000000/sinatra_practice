@@ -15,6 +15,11 @@ get %r{/memos/?} do
   erb :memos
 end
 
+get '/' do
+  @page_title = 'メモ一覧'
+  redirect redirect "http://localhost:4567/memos"
+end
+
 get '/memos/new' do
   @page_title = '新規作成'
   erb :new
