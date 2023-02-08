@@ -17,7 +17,7 @@ end
 
 get '/' do
   @page_title = 'メモ一覧'
-  redirect redirect "http://localhost:4567/memos"
+  redirect redirect 'http://localhost:4567/memos'
 end
 
 get '/memos/new' do
