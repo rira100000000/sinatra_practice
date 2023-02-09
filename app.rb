@@ -33,6 +33,7 @@ post '/memos/create' do
   files.puts("#{@id},#{@title}")
   files.close
   current_dir = Dir.pwd
+  Dir.mkdir ("#{current_dir}/data") unless Dir.exist?("#{current_dir}/data")
   new_file = File.new("#{current_dir}/data/#{@id}.txt", 'w')
   new_file.puts(@content)
   new_file.close
