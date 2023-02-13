@@ -4,8 +4,10 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'csv'
 
+set :strict_paths, false
 enable :method_override
-get %r{/memos/?} do
+
+get '/memos' do
   @page_title = 'メモ一覧'
   data_dir = "#{Dir.pwd}/data"
   Dir.mkdir(data_dir) unless Dir.exist?(data_dir)
@@ -23,7 +25,6 @@ get %r{/memos/?} do
 end
 
 get '/' do
-  @page_title = 'メモ一覧'
   redirect redirect '/memos'
 end
 
@@ -67,7 +68,7 @@ patch '/memos/:id/update' do
 end
 
 get '/memos/:id/show' do
-  fetched_memo = fetch_memo
+  fetched_memo = fetch_memo(params[:id])
   @id = fetched_memo['id']
   @title = fetched_memo['title']
   @content = fetched_memo['content']
@@ -76,7 +77,7 @@ get '/memos/:id/show' do
 end
 
 get '/memos/:id/edit' do
-  fetched_memo = fetch_memo
+  fetched_memo = fetch_memo(params[:id])
   @id = fetched_memo['id']
   @title = fetched_memo['title']
   @content = fetched_memo['content']
@@ -86,7 +87,7 @@ end
 
 delete '/memos/:id/delete' do
   data_dir = "#{Dir.pwd}/data"
-  fetched_memo = fetch_memo
+  fetched_memo = fetch_memo(params[:id])
   id = fetched_memo['id']
   table = CSV.table("#{data_dir}/memos.csv").delete_if { |row| row[:id].to_i == id.to_i }
 
@@ -104,9 +105,8 @@ not_found do
   '404 お探しのページは存在しません'
 end
 
-def fetch_memo
+def fetch_memo(id)
   data_dir = "#{Dir.pwd}/data"
-  id = request.url.match("(?<=memos\/).*(?=\/)")[0]
   CSV.foreach("#{data_dir}/memos.csv", headers: true) do |memo|
     return memo if memo['id'] == id
   end
