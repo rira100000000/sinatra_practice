@@ -2,14 +2,20 @@
 
 require 'sinatra'
 require 'sinatra/reloader'
+require 'csv'
 
 enable :method_override
 get %r{/memos/?} do
   @page_title = 'メモ一覧'
-  if File.exist?('file_infos.txt')
-    @files = IO.readlines('file_infos.txt')
+  data_dir = "#{Dir.pwd}/data"
+  Dir.mkdir(data_dir) unless Dir.exist?(data_dir)
+  if File.exist?("#{data_dir}/memos.csv")
+    @memos = []
+    CSV.foreach("#{data_dir}/memos.csv") do |row|
+      @memos << [row[0], row[1]]
+    end
   else
-    file = File.new('file_infos.txt', 'w')
+    file = File.new("#{data_dir}/memos.csv", 'w')
     file.close
   end
   erb :memos
@@ -26,18 +32,17 @@ get '/memos/new' do
 end
 
 post '/memos/create' do
-  @title = protect_xss(params[:title])
-  @content = protect_xss(params[:content])
-  @id = File.read('file_infos.txt').count("\n")
-  files = File.open('file_infos.txt', 'a')
-  files.puts("#{@id},#{@title}")
-  files.close
-  current_dir = Dir.pwd
-  Dir.mkdir ("#{current_dir}/data") unless Dir.exist?("#{current_dir}/data")
-  new_file = File.new("#{current_dir}/data/#{@id}.txt", 'w')
-  new_file.puts(@content)
-  new_file.close
-  redirect "http://localhost:4567/memos/#{@id}/show"
+  data_dir = "#{Dir.pwd}/data"
+  title = protect_xss(params[:title])
+  content = protect_xss(params[:content])
+  id = File.read("#{data_dir}/max_id.txt").to_i + 1
+  memos = File.open("#{data_dir}/memos.csv", 'a')
+  memos.puts("#{id},#{title},#{content}")
+  memos.close
+  max_id_file = File.open("#{data_dir}/max_id.txt", 'w')
+  max_id_file.puts(id)
+  max_id_file.close
+  redirect "http://localhost:4567/memos/#{id}/show"
 end
 
 patch '/memos/:id/update' do
@@ -45,11 +50,11 @@ patch '/memos/:id/update' do
   @content = protect_xss(params[:content])
   @id = params[:id]
   current_dir = Dir.pwd
-  file_infos = IO.readlines('file_infos.txt')
+  file_infos = IO.readlines('memos.csv')
   file_infos.each_with_index do |file_info, index|
     info_id, _info_title = file_info.split(',')
     if info_id == @id
-      replace_line("#{current_dir}/file_infos.txt", index, "#{@id},#{@title}\n")
+      replace_line("#{current_dir}/memos.csv", index, "#{@id},#{@title}\n")
       break
     end
   end
@@ -60,10 +65,8 @@ patch '/memos/:id/update' do
 end
 
 get '/memos/:id/show' do
-  current_dir = Dir.pwd
-  @id, @title = *fetch_id_and_title
+  @id, @title, @content = *fetch_title_and_content
   @page_title = @title
-  @content = File.read("#{current_dir}/data/#{@id}.txt")
   erb :show
 end
 
@@ -77,13 +80,13 @@ end
 
 delete '/memos/:id/delete' do
   current_dir = Dir.pwd
-  file_infos = IO.readlines('file_infos.txt')
+  file_infos = IO.readlines('memos.csv')
   @id, @title = *fetch_id_and_title
   file_infos.each_with_index do |file_info, index|
     info_id, info_title = file_info.split(',')
     if info_id == @id
       info_title.gsub!("\n", '')
-      replace_line("#{current_dir}/file_infos.txt", index, "#{info_id},#{info_title},true\n")
+      replace_line("#{current_dir}/memos.csv", index, "#{info_id},#{info_title},true\n")
       break
     end
     next
@@ -96,12 +99,11 @@ not_found do
   '404 お探しのページは存在しません'
 end
 
-def fetch_id_and_title
-  id = request.url.match("(?<=memos\/).*(?=\/)")
-  file_infos = IO.readlines('file_infos.txt')
-  file_infos.each do |file_info|
-    info_id, info_title = file_info.split(',')
-    return [info_id, info_title] if info_id == id.to_s
+def fetch_title_and_content
+  data_dir = "#{Dir.pwd}/data"
+  id = request.url.match("(?<=memos\/).*(?=\/)")[0]
+  CSV.foreach("#{data_dir}/memos.csv") do |memo|
+    return memo if memo[0] == id
   end
 end
 

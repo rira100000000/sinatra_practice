@@ -26,8 +26,7 @@ bundle exec ruby app.rb
 ```
  
 # Note
-作成したメモのデータはdataディレクトリ配下にIDを名前として保存されます。<br>
-作成したメモはrootディレクトリのfile_infos.txtで管理されます。
+作成したメモのデータはdataディレクトリ配下にmemos.csvとして保存されます。<br>
 `bundle exec ruby app.rb`実行後、ブラウザから`http://localhost:4567`にアクセスしてください。
 # 作成者
 rira100000000
