@@ -118,9 +118,9 @@ def protect_xss(text)
 end
 
 def prepare_max_id_file(data_dir)
-  unless File.exist?("#{data_dir}/max_id.txt")
-    max_id_file = File.open("#{data_dir}/max_id.txt", 'w')
-    max_id_file.puts(0)
-    max_id_file.close
-  end
+  return if File.exist?("#{data_dir}/max_id.txt")
+
+  max_id_file = File.open("#{data_dir}/max_id.txt", 'w')
+  max_id_file.puts(0)
+  max_id_file.close
 end
