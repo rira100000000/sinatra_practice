@@ -112,14 +112,6 @@ def fetch_memo
   end
 end
 
-def replace_line(file_name, line_num, new_line)
-  lines = IO.readlines(file_name)
-  lines[line_num] = new_line
-  file = File.open(file_name, 'w')
-  file.puts(lines.join)
-  file.close
-end
-
 def protect_xss(text)
   Rack::Utils.escape_html(text)
 end
