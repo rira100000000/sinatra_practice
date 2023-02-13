@@ -11,6 +11,7 @@ get '/memos' do
   @page_title = 'メモ一覧'
   data_dir = "#{Dir.pwd}/data"
   Dir.mkdir(data_dir) unless Dir.exist?(data_dir)
+  prepare_max_id_file(data_dir)
   if File.exist?("#{data_dir}/memos.csv")
     @memos = []
     CSV.foreach("#{data_dir}/memos.csv", headers: true) do |memo|
@@ -114,4 +115,12 @@ end
 
 def protect_xss(text)
   Rack::Utils.escape_html(text)
+end
+
+def prepare_max_id_file(data_dir)
+  unless File.exist?("#{data_dir}/max_id.txt")
+    max_id_file = File.open("#{data_dir}/max_id.txt", 'w')
+    max_id_file.puts(0)
+    max_id_file.close
+  end
 end
