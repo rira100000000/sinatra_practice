@@ -53,9 +53,7 @@ patch '/memos/:id/update' do
   id = protect_xss(params[:id]).to_i
   table = CSV.table("#{data_dir}/memos.csv")
   index = table.each_with_index do |row, i|
-    if row[:id] == id
-      break i
-    end
+    break i if row[:id] == id
   end
   table[index] = [id.to_s, title.to_s, content.to_s]
 
@@ -87,17 +85,16 @@ get '/memos/:id/edit' do
 end
 
 delete '/memos/:id/delete' do
-  current_dir = Dir.pwd
-  file_infos = IO.readlines('memos.csv')
-  @id, @title = *fetch_id_and_title
-  file_infos.each_with_index do |file_info, index|
-    info_id, info_title = file_info.split(',')
-    if info_id == @id
-      info_title.gsub!("\n", '')
-      replace_line("#{current_dir}/memos.csv", index, "#{info_id},#{info_title},true\n")
-      break
+  data_dir = "#{Dir.pwd}/data"
+  fetched_memo = fetch_memo
+  id = fetched_memo['id']
+  table = CSV.table("#{data_dir}/memos.csv").delete_if { |row| row[:id].to_i == id.to_i }
+
+  CSV.open("#{data_dir}/memos.csv", 'w') do |memo|
+    memo << table.headers
+    table.each do |row|
+      memo << row
     end
-    next
   end
   redirect '/memos'
 end
