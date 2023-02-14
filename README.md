@@ -8,14 +8,6 @@ sinatraを使って簡単なメモアプリを作成しました。
 * gem 'sinatra-contrib'
 * gem 'webrick'
 
-# インストール
-
-clone後にbundle installを使って必要なgemをインストールできます。
-
-```bash
-bundle install
-```
- 
 # 使い方
 
 ```bash
