@@ -1,9 +1,9 @@
 <div class="mid_box">
-  <a href="http://localhost:4567/memos/new" class="button">新規作成</a><br>
+  <a href="/memos/new" class="button">新規作成</a><br>
   <% unless @memos.nil? %>
     <% @memos.each do |memo| %>
       <% id, title = *memo %>
-      <a href="<%= "http://localhost:4567/memos/#{id}/show" %>"> <%= "●" + title %> </a><br>
+      <a href="<%= "/memos/#{id}/show" %>"> ●<%= title %> </a><br>
     <% end %>
   <% end %>
 </div>
