@@ -26,7 +26,7 @@ get '/memos' do
 end
 
 get '/' do
-  redirect redirect '/memos'
+  redirect '/memos'
 end
 
 get '/memos/new' do
