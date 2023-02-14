@@ -51,7 +51,7 @@ patch '/memos/:id/update' do
   data_dir = "#{Dir.pwd}/data"
   title = protect_xss(params[:title])
   content = protect_xss(params[:content])
-  id = protect_xss(params[:id]).to_i
+  id = params[:id].to_i
   table = CSV.table("#{data_dir}/memos.csv")
   index = table.each_with_index do |row, i|
     break i if row[:id] == id
