@@ -5,7 +5,6 @@ require 'sinatra/reloader'
 require 'csv'
 
 set :strict_paths, false
-enable :method_override
 
 get '/memos' do
   @page_title = 'メモ一覧'
@@ -57,7 +56,7 @@ patch '/memos/:id/update' do
   index = table.each_with_index do |row, i|
     break i if row[:id] == id
   end
-  table[index] = [id.to_s, title.to_s, content.to_s]
+  table[index] = [id.to_s, title, content]
 
   CSV.open("#{data_dir}/memos.csv", 'w') do |memo|
     memo << table.headers
