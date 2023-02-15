@@ -21,7 +21,7 @@ get '/memos' do
   @memos = []
 
   CSV.foreach(@csv_path, headers: true) do |memo|
-    @memos << {id: memo['id'], title: memo['title'] }
+    @memos << { id: memo['id'], title: memo['title'] }
   end
   erb :memos
 end
@@ -110,7 +110,7 @@ end
 def prepare_max_id_file(max_id_path)
   return if File.exist?(max_id_path)
 
-  File.open(max_id_path, 'w'){ |file| file.puts(0) }
+  File.open(max_id_path, 'w') { |file| file.puts(0) }
 end
 
 def prepare_data_file(csv_path)
