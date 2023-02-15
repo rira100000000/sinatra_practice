@@ -10,22 +10,19 @@ before do
   data_dir = File.join(Dir.pwd, 'data')
   @csv_path = File.join(data_dir, 'memos.csv')
   @max_id_path = File.join(data_dir, 'max_id.txt')
+
   Dir.mkdir(data_dir) unless Dir.exist?(data_dir)
   prepare_max_id_file(@max_id_path)
-  if File.exist?(@csv_path)
-    @memos = []
-    CSV.foreach(@csv_path, headers: true) do |memo|
-      @memos << [memo[0], memo[1]]
-    end
-  else
-    file = File.new(@csv_path, 'w')
-    file.puts('"id","title","content"')
-    file.close
-  end
+  prepare_data_file(@csv_path)
 end
 
 get '/memos' do
   @page_title = 'メモ一覧'
+  @memos = []
+
+  CSV.foreach(@csv_path, headers: true) do |memo|
+    @memos << [memo[0], memo[1]]
+  end
   erb :memos
 end
 
@@ -123,4 +120,10 @@ def prepare_max_id_file(max_id_path)
   max_id_file = File.open(@max_id_path, 'w')
   max_id_file.puts(0)
   max_id_file.close
+end
+
+def prepare_data_file(csv_path)
+  return if File.exist?(csv_path)
+
+  CSV.open(csv_path, 'w') { |csv| csv << %w[id title content] }
 end
