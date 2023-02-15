@@ -49,6 +49,7 @@ patch '/memos/:id' do
   title = protect_xss(params[:title])
   content = protect_xss(params[:content])
   id = params[:id].to_i
+
   table = CSV.table(@csv_path)
   index = table.each_with_index do |row, i|
     break i if row[:id] == id
