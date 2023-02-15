@@ -6,7 +6,7 @@
   <p class="display_new_line"><%= @content %></p>
   <div class="menu">
     <a href="/memos/<%= @id %>/edit" class="button">Edit</a>
-    <form action="/memos/<%= @id %>/delete" method="post">
+    <form action="/memos/<%= @id %>" method="post">
       <input type="hidden" name="_method" value="delete">
       <input type="submit" value="Delete" class="button">
     </form>

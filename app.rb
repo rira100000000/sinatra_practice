@@ -35,7 +35,7 @@ get '/memos/new' do
   erb :new
 end
 
-post '/memos/create' do
+post '/memos' do
   title = protect_xss(params[:title])
   content = protect_xss(params[:content])
   id = File.read(@max_id_path).to_i + 1
@@ -45,10 +45,10 @@ post '/memos/create' do
   max_id_file = File.open(@max_id_path, 'w')
   max_id_file.puts(id)
   max_id_file.close
-  redirect "/memos/#{id}/show"
+  redirect "/memos/#{id}"
 end
 
-patch '/memos/:id/update' do
+patch '/memos/:id' do
   title = protect_xss(params[:title])
   content = protect_xss(params[:content])
   id = params[:id].to_i
@@ -64,10 +64,10 @@ patch '/memos/:id/update' do
       memo << row
     end
   end
-  redirect "/memos/#{id}/show"
+  redirect "/memos/#{id}"
 end
 
-get '/memos/:id/show' do
+get '/memos/:id' do
   fetched_memo = fetch_memo(params[:id], @csv_path)
   @id = fetched_memo['id']
   @title = fetched_memo['title']
@@ -85,7 +85,7 @@ get '/memos/:id/edit' do
   erb :edit
 end
 
-delete '/memos/:id/delete' do
+delete '/memos/:id' do
   fetched_memo = fetch_memo(params[:id], @csv_path)
   id = fetched_memo['id']
   table = CSV.table(@csv_path).delete_if { |row| row[:id].to_i == id.to_i }

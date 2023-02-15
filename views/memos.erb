@@ -3,7 +3,7 @@
   <% unless @memos.nil? %>
     <% @memos.each do |memo| %>
       <% id, title = *memo %>
-      <a href="<%= "/memos/#{id}/show" %>"> ●<%= title %> </a><br>
+      <a href="<%= "/memos/#{id}" %>"> ●<%= title %> </a><br>
     <% end %>
   <% end %>
 </div>
