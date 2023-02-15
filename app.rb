@@ -39,12 +39,9 @@ post '/memos' do
   title = protect_xss(params[:title])
   content = protect_xss(params[:content])
   id = File.read(@max_id_path).to_i + 1
-  memos = CSV.open(@csv_path, 'a', quote_char: '"')
-  memos << [id, title, content]
-  memos.close
-  max_id_file = File.open(@max_id_path, 'w')
-  max_id_file.puts(id)
-  max_id_file.close
+
+  CSV.open(@csv_path, 'a', quote_char: '"') { |csv| csv << [id, title, content] }
+  File.open(@max_id_path, 'w') { |file| file << id }
   redirect "/memos/#{id}"
 end
 
