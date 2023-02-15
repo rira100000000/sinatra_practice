@@ -61,6 +61,7 @@ p {
 }
 .title_area {
   width: 100%;
+  border-bottom: 1px solid #79854c;
 }
 .display_new_line {
   white-space: pre-wrap;
