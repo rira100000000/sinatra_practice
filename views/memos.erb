@@ -1,9 +1,8 @@
 <div class="mid_box">
   <a href="/memos/new" class="button">新規作成</a><br>
-  <% unless @memos.nil? %>
+  <% unless @memos.empty? %>
     <% @memos.each do |memo| %>
-      <% id, title = *memo %>
-      <a href="<%= "/memos/#{id}" %>"> ●<%= title %> </a><br>
+      <a href="<%= "/memos/#{memo[:id]}" %>"> ●<%= memo[:title] %> </a><br>
     <% end %>
   <% end %>
 </div>

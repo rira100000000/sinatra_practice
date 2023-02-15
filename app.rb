@@ -21,7 +21,7 @@ get '/memos' do
   @memos = []
 
   CSV.foreach(@csv_path, headers: true) do |memo|
-    @memos << [memo['id'], memo['title']]
+    @memos << {id: memo['id'], title: memo['title'] }
   end
   erb :memos
 end
