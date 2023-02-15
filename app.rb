@@ -115,11 +115,9 @@ def protect_xss(text)
 end
 
 def prepare_max_id_file(max_id_path)
-  return if File.exist?(@max_id_path)
+  return if File.exist?(max_id_path)
 
-  max_id_file = File.open(@max_id_path, 'w')
-  max_id_file.puts(0)
-  max_id_file.close
+  File.open(max_id_path, 'w'){ |file| file.puts(0) }
 end
 
 def prepare_data_file(csv_path)
