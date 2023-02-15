@@ -6,21 +6,26 @@ require 'csv'
 
 set :strict_paths, false
 
-get '/memos' do
-  @page_title = 'メモ一覧'
-  data_dir = "#{Dir.pwd}/data"
+before do
+  data_dir = File.join(Dir.pwd, 'data')
+  @csv_path = File.join(data_dir, 'memos.csv')
+  @max_id_path = File.join(data_dir, 'max_id.txt')
   Dir.mkdir(data_dir) unless Dir.exist?(data_dir)
-  prepare_max_id_file(data_dir)
-  if File.exist?("#{data_dir}/memos.csv")
+  prepare_max_id_file(@max_id_path)
+  if File.exist?(@csv_path)
     @memos = []
-    CSV.foreach("#{data_dir}/memos.csv", headers: true) do |memo|
+    CSV.foreach(@csv_path, headers: true) do |memo|
       @memos << [memo[0], memo[1]]
     end
   else
-    file = File.new("#{data_dir}/memos.csv", 'w')
+    file = File.new(@csv_path, 'w')
     file.puts('"id","title","content"')
     file.close
   end
+end
+
+get '/memos' do
+  @page_title = 'メモ一覧'
   erb :memos
 end
 
@@ -34,31 +39,29 @@ get '/memos/new' do
 end
 
 post '/memos/create' do
-  data_dir = "#{Dir.pwd}/data"
   title = protect_xss(params[:title])
   content = protect_xss(params[:content])
-  id = File.read("#{data_dir}/max_id.txt").to_i + 1
-  memos = CSV.open("#{data_dir}/memos.csv", 'a', quote_char: '"')
+  id = File.read(@max_id_path).to_i + 1
+  memos = CSV.open(@csv_path, 'a', quote_char: '"')
   memos << [id, title, content]
   memos.close
-  max_id_file = File.open("#{data_dir}/max_id.txt", 'w')
+  max_id_file = File.open(@max_id_path, 'w')
   max_id_file.puts(id)
   max_id_file.close
   redirect "/memos/#{id}/show"
 end
 
 patch '/memos/:id/update' do
-  data_dir = "#{Dir.pwd}/data"
   title = protect_xss(params[:title])
   content = protect_xss(params[:content])
   id = params[:id].to_i
-  table = CSV.table("#{data_dir}/memos.csv")
+  table = CSV.table(@csv_path)
   index = table.each_with_index do |row, i|
     break i if row[:id] == id
   end
   table[index] = [id.to_s, title, content]
 
-  CSV.open("#{data_dir}/memos.csv", 'w') do |memo|
+  CSV.open(@csv_path, 'w') do |memo|
     memo << table.headers
     table.each do |row|
       memo << row
@@ -68,7 +71,7 @@ patch '/memos/:id/update' do
 end
 
 get '/memos/:id/show' do
-  fetched_memo = fetch_memo(params[:id])
+  fetched_memo = fetch_memo(params[:id], @csv_path)
   @id = fetched_memo['id']
   @title = fetched_memo['title']
   @content = fetched_memo['content']
@@ -77,7 +80,7 @@ get '/memos/:id/show' do
 end
 
 get '/memos/:id/edit' do
-  fetched_memo = fetch_memo(params[:id])
+  fetched_memo = fetch_memo(params[:id], @csv_path)
   @id = fetched_memo['id']
   @title = fetched_memo['title']
   @content = fetched_memo['content']
@@ -86,12 +89,11 @@ get '/memos/:id/edit' do
 end
 
 delete '/memos/:id/delete' do
-  data_dir = "#{Dir.pwd}/data"
-  fetched_memo = fetch_memo(params[:id])
+  fetched_memo = fetch_memo(params[:id], @csv_path)
   id = fetched_memo['id']
-  table = CSV.table("#{data_dir}/memos.csv").delete_if { |row| row[:id].to_i == id.to_i }
+  table = CSV.table(@csv_path).delete_if { |row| row[:id].to_i == id.to_i }
 
-  CSV.open("#{data_dir}/memos.csv", 'w') do |memo|
+  CSV.open(@csv_path, 'w') do |memo|
     memo << table.headers
     table.each do |row|
       memo << row
@@ -105,9 +107,8 @@ not_found do
   '404 お探しのページは存在しません'
 end
 
-def fetch_memo(id)
-  data_dir = "#{Dir.pwd}/data"
-  CSV.foreach("#{data_dir}/memos.csv", headers: true) do |memo|
+def fetch_memo(id, csv_path)
+  CSV.foreach(csv_path, headers: true) do |memo|
     return memo if memo['id'] == id
   end
 end
@@ -116,10 +117,10 @@ def protect_xss(text)
   Rack::Utils.escape_html(text)
 end
 
-def prepare_max_id_file(data_dir)
-  return if File.exist?("#{data_dir}/max_id.txt")
+def prepare_max_id_file(max_id_path)
+  return if File.exist?(@max_id_path)
 
-  max_id_file = File.open("#{data_dir}/max_id.txt", 'w')
+  max_id_file = File.open(@max_id_path, 'w')
   max_id_file.puts(0)
   max_id_file.close
 end
