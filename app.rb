@@ -68,27 +68,20 @@ patch '/memos/:id' do
 end
 
 get '/memos/:id' do
-  fetched_memo = fetch_memo(params[:id], @csv_path)
-  @id = fetched_memo['id']
-  @title = fetched_memo['title']
-  @content = fetched_memo['content']
+  @memo = fetch_memo(params[:id], @csv_path)
   @page_title = @title
   erb :show
 end
 
 get '/memos/:id/edit' do
-  fetched_memo = fetch_memo(params[:id], @csv_path)
-  @id = fetched_memo['id']
-  @title = fetched_memo['title']
-  @content = fetched_memo['content']
+  @memo = fetch_memo(params[:id], @csv_path)
   @page_title = "#{@title}-編集"
   erb :edit
 end
 
 delete '/memos/:id' do
   fetched_memo = fetch_memo(params[:id], @csv_path)
-  id = fetched_memo['id']
-  table = CSV.table(@csv_path).delete_if { |row| row[:id].to_i == id.to_i }
+  table = CSV.table(@csv_path).delete_if { |row| row[:id].to_i == fetched_memo['id'].to_i }
 
   CSV.open(@csv_path, 'w') do |memo|
     memo << table.headers
