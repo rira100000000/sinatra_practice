@@ -70,14 +70,14 @@ end
 get '/memos/:id' do
   @memo = fetch_memo(params[:id], @csv_path)
   
-  @page_title = @title
+  @page_title = @memo['title']
   erb :show
 end
 
 get '/memos/:id/edit' do
   @memo = fetch_memo(params[:id], @csv_path)
   
-  @page_title = "#{@title}-編集"
+  @page_title = "#{@memo['title']}-編集"
   erb :edit
 end
 
