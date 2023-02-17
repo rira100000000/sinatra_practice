@@ -42,7 +42,7 @@ post '/memos' do
   id = File.read(MAX_ID_PATH).to_i + 1
   title = protect_xss(params[:title])
   content = protect_xss(params[:content])
-  
+
   CSV.open(CSV_PATH, 'a', quote_char: '"') { |csv| csv << [id, title, content] }
   File.open(MAX_ID_PATH, 'w') { |file| file << id }
 
@@ -72,14 +72,14 @@ end
 
 get '/memos/:id' do
   @memo = fetch_memo(params[:id])
-  
+
   @page_title = @memo[:title]
   erb :show
 end
 
 get '/memos/:id/edit' do
   @memo = fetch_memo(params[:id])
-  
+
   @page_title = "#{@memo[:title]}-編集"
   erb :edit
 end
@@ -94,7 +94,7 @@ delete '/memos/:id' do
       memo << row
     end
   end
-  
+
   redirect '/memos'
 end
 
