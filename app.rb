@@ -6,19 +6,19 @@ require 'csv'
 
 set :strict_paths, false
 
-before do
-  data_dir = File.join(Dir.pwd, 'data')
-  @csv_path = File.join(data_dir, 'memos.csv')
-  @max_id_path = File.join(data_dir, 'max_id.txt')
+DATA_DIR = File.join(Dir.pwd, 'data')
+CSV_PATH = File.join(DATA_DIR, 'memos.csv')
+MAX_ID_PATH = File.join(DATA_DIR, 'max_id.txt')
 
-  Dir.mkdir(data_dir) unless Dir.exist?(data_dir)
-  prepare_max_id_file(@max_id_path)
-  prepare_data_file(@csv_path)
+before do
+  Dir.mkdir(DATA_DIR) unless Dir.exist?(DATA_DIR)
+  prepare_max_id_file
+  prepare_data_file
 end
 
 get '/memos' do
   @memos = []
-  CSV.foreach(@csv_path, headers: true) do |memo|
+  CSV.foreach(CSV_PATH, headers: true) do |memo|
     @memos << { id: memo['id'], title: memo['title'] }
   end
 
@@ -36,12 +36,12 @@ get '/memos/new' do
 end
 
 post '/memos' do
-  id = File.read(@max_id_path).to_i + 1
+  id = File.read(MAX_ID_PATH).to_i + 1
   title = protect_xss(params[:title])
   content = protect_xss(params[:content])
   
-  CSV.open(@csv_path, 'a', quote_char: '"') { |csv| csv << [id, title, content] }
-  File.open(@max_id_path, 'w') { |file| file << id }
+  CSV.open(CSV_PATH, 'a', quote_char: '"') { |csv| csv << [id, title, content] }
+  File.open(MAX_ID_PATH, 'w') { |file| file << id }
 
   redirect "/memos/#{id}"
 end
@@ -51,13 +51,13 @@ patch '/memos/:id' do
   title = protect_xss(params[:title])
   content = protect_xss(params[:content])
 
-  table = CSV.table(@csv_path)
+  table = CSV.table(CSV_PATH)
   index = table.each_with_index do |row, i|
     break i if row[:id] == id
   end
   table[index] = [id.to_s, title, content]
 
-  CSV.open(@csv_path, 'w') do |memo|
+  CSV.open(CSV_PATH, 'w') do |memo|
     memo << table.headers
     table.each do |row|
       memo << row
@@ -68,24 +68,24 @@ patch '/memos/:id' do
 end
 
 get '/memos/:id' do
-  @memo = fetch_memo(params[:id], @csv_path)
+  @memo = fetch_memo(params[:id])
   
   @page_title = @memo['title']
   erb :show
 end
 
 get '/memos/:id/edit' do
-  @memo = fetch_memo(params[:id], @csv_path)
+  @memo = fetch_memo(params[:id])
   
   @page_title = "#{@memo['title']}-編集"
   erb :edit
 end
 
 delete '/memos/:id' do
-  fetched_memo = fetch_memo(params[:id], @csv_path)
-  table = CSV.table(@csv_path).delete_if { |row| row[:id].to_i == fetched_memo['id'].to_i }
+  fetched_memo = fetch_memo(params[:id])
+  table = CSV.table(CSV_PATH).delete_if { |row| row[:id].to_i == fetched_memo['id'].to_i }
 
-  CSV.open(@csv_path, 'w') do |memo|
+  CSV.open(CSV_PATH, 'w') do |memo|
     memo << table.headers
     table.each do |row|
       memo << row
@@ -100,8 +100,8 @@ not_found do
   '404 お探しのページは存在しません'
 end
 
-def fetch_memo(id, csv_path)
-  CSV.foreach(csv_path, headers: true) do |memo|
+def fetch_memo(id)
+  CSV.foreach(CSV_PATH, headers: true) do |memo|
     return memo if memo['id'] == id
   end
 end
@@ -110,14 +110,14 @@ def protect_xss(text)
   Rack::Utils.escape_html(text)
 end
 
-def prepare_max_id_file(max_id_path)
-  return if File.exist?(max_id_path)
+def prepare_max_id_file
+  return if File.exist?(MAX_ID_PATH)
 
-  File.open(max_id_path, 'w') { |file| file.puts(0) }
+  File.open(MAX_ID_PATH, 'w') { |file| file.puts(0) }
 end
 
-def prepare_data_file(csv_path)
-  return if File.exist?(csv_path)
+def prepare_data_file
+  return if File.exist?(CSV_PATH)
 
-  CSV.open(csv_path, 'w') { |csv| csv << %w[id title content] }
+  CSV.open(CSV_PATH, 'w') { |csv| csv << %w[id title content] }
 end
