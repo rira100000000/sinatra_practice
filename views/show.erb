@@ -1,12 +1,12 @@
 <div class="mid_box">
 <a href="/memos">戻る</a>
   <div class="title_area">
-    <p class="title"><%= @memo['title'] %></p>
+    <p class="title"><%= @memo[:title] %></p>
   </div>
-  <p class="display_new_line"><%= @memo['content'] %></p>
+  <p class="display_new_line"><%= @memo[:content] %></p>
   <div class="menu">
-    <a href="/memos/<%= @memo['id'] %>/edit" class="button">Edit</a>
-    <form action="/memos/<%= @memo['id'] %>" method="post">
+    <a href="/memos/<%= @memo[:id] %>/edit" class="button">Edit</a>
+    <form action="/memos/<%= @memo[:id] %>" method="post">
       <input type="hidden" name="_method" value="delete">
       <input type="submit" value="Delete" class="button">
     </form>

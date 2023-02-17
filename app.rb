@@ -18,8 +18,11 @@ end
 
 get '/memos' do
   @memos = []
-  CSV.foreach(CSV_PATH, headers: true) do |memo|
-    @memos << { id: memo['id'], title: memo['title'] }
+  CSV.open(CSV_PATH, headers: true) do |csv|
+    csv.header_convert(:symbol)
+    csv.each do |memo|
+      @memos << { id: memo[:id], title: memo[:title] }
+    end
   end
 
   @page_title = 'メモ一覧'
@@ -70,20 +73,20 @@ end
 get '/memos/:id' do
   @memo = fetch_memo(params[:id])
   
-  @page_title = @memo['title']
+  @page_title = @memo[:title]
   erb :show
 end
 
 get '/memos/:id/edit' do
   @memo = fetch_memo(params[:id])
   
-  @page_title = "#{@memo['title']}-編集"
+  @page_title = "#{@memo[:title]}-編集"
   erb :edit
 end
 
 delete '/memos/:id' do
   fetched_memo = fetch_memo(params[:id])
-  table = CSV.table(CSV_PATH).delete_if { |row| row[:id].to_i == fetched_memo['id'].to_i }
+  table = CSV.table(CSV_PATH).delete_if { |row| row[:id].to_i == fetched_memo[:id].to_i }
 
   CSV.open(CSV_PATH, 'w') do |memo|
     memo << table.headers
@@ -101,8 +104,11 @@ not_found do
 end
 
 def fetch_memo(id)
-  CSV.foreach(CSV_PATH, headers: true) do |memo|
-    return memo if memo['id'] == id
+  CSV.open(CSV_PATH, headers: true) do |csv|
+    csv.header_convert(:symbol)
+    csv.each do |memo|
+      return memo if memo[:id] == id
+    end
   end
 end
 
