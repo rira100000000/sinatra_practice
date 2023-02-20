@@ -18,8 +18,7 @@ end
 
 get '/memos' do
   @memos = []
-  CSV.open(CSV_PATH, headers: true) do |csv|
-    csv.header_convert(:symbol)
+  CSV.open(CSV_PATH, headers: true, header_converters: :symbol) do |csv|
     csv.each do |memo|
       @memos << { id: memo[:id], title: memo[:title] }
     end
@@ -104,8 +103,7 @@ not_found do
 end
 
 def fetch_memo(id)
-  CSV.open(CSV_PATH, headers: true) do |csv|
-    csv.header_convert(:symbol)
+  CSV.open(CSV_PATH, headers: true, header_converters: :symbol) do |csv|
     csv.each do |memo|
       return memo if memo[:id] == id
     end
