@@ -102,8 +102,8 @@ end
 
 def fetch_memo(id)
   CSV.open(CSV_PATH, headers: true, header_converters: :symbol) do |csv|
-    csv.each do |memo|
-      return memo if memo[:id] == id
+    csv.find do |memo|
+      memo[:id] == id
     end
   end
 end
