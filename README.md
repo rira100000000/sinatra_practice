@@ -6,10 +6,11 @@ sinatraを使って簡単なメモアプリを作成しました。
 * gem 'sinatra'
 * gem 'sinatra-contrib'
 * gem 'webrick'
+* gem 'pg'
 
 # 使い方
 ```bash
-git clone -b sinatra_practice https://github.com/rira100000000/sinatra_practice.git
+git clone -b sinatra_practice https://github.com/rira100000000/sinatra_practice_db.git
 cd <cloneしたディレクトリ>
 bundle install
 bundle exec ruby app.rb
