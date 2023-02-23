@@ -98,7 +98,7 @@ end
 
 def table_exists?(db_connect, table_name)
   result = db_connect.exec("SELECT EXISTS (
-    SELECT 1 FROM information_schema.tables WHERE  table_name = '#{table_name}'
+    SELECT 1 FROM information_schema.tables WHERE table_name = '#{table_name}'
     );")
   result.field_name_type = :symbol
   result[0][:exists] == 't'
