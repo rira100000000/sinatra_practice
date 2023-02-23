@@ -11,10 +11,13 @@ sinatraを使って簡単なメモアプリを作成しました。
 # PostgreSQLの設定
 PostgreSQLを使用します。
 以下のDB、ユーザー、ポートを使用します。
-DB名:sinatra_practice
+>DB名:sinatra_practice
 ユーザ名:postgres
 パスワード:postgres
 使用ポート:5432
+
+ユーザーpostgresで以下のSQLコマンドを実行してください。
+`CREATE DATABASE sinatra_practice`
 
 # 使い方
 ```bash
