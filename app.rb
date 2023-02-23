@@ -47,9 +47,10 @@ post '/memos' do
   @content = protect_xss(params[:content])
 
   @db_connect.exec("INSERT INTO memos(title, content) VALUES('#{@title}', '#{@content}');")
-  id = @db_connect.exec('SELECT MAX(id) FROM memos')[0]['max']
+  result = @db_connect.exec('SELECT MAX(id) FROM memos')
+  result.field_name_type = :symbol
 
-  redirect "/memos/#{id}"
+  redirect "/memos/#{result[0][:max]}"
 end
 
 patch '/memos/:id' do
