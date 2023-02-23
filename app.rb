@@ -43,10 +43,9 @@ get '/memos/new' do
 end
 
 post '/memos' do
-  @title = protect_xss(params[:title])
-  @content = protect_xss(params[:content])
-
-  @db_connect.exec("INSERT INTO memos(title, content) VALUES('#{@title}', '#{@content}');")
+  title = protect_xss(params[:title])
+  content = protect_xss(params[:content])
+  @db_connect.exec_params('INSERT INTO memos(title, content) VALUES($1, $2)', [title, content])
   result = @db_connect.exec('SELECT MAX(id) FROM memos')
   result.field_name_type = :symbol
 
@@ -58,7 +57,7 @@ patch '/memos/:id' do
   title = protect_xss(params[:title])
   content = protect_xss(params[:content])
 
-  @db_connect.exec("UPDATE memos SET title = '#{title}', content = '#{content}' WHERE id = '#{id}' ;")
+  @db_connect.exec_params('UPDATE memos SET title = $1, content = $2 WHERE id = $3', [title, content, id])
 
   redirect "/memos/#{id}"
 end
