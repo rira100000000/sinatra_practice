@@ -17,11 +17,11 @@ before do
   @db_connect = PG::Connection.new(host: HOST, port: PORT, dbname: DB_NAME, user: USER, password: PASSWORD)
   @db_connect.set_client_encoding('UTF8')
   if table_exists?(@db_connect, DB_NAME)
-    @db_connect.exec "CREATE TABLE memos (
+    @db_connect.exec("CREATE TABLE memos (
       id serial primary key,
       title varchar(255),
       content text
-    );"
+    );")
   end
 end
 
@@ -46,7 +46,7 @@ post '/memos' do
   @title = protect_xss(params[:title])
   @content = protect_xss(params[:content])
 
-  @db_connect.exec "INSERT INTO memos(title, content) VALUES('#{@title}', '#{@content}');"
+  @db_connect.exec("INSERT INTO memos(title, content) VALUES('#{@title}', '#{@content}');")
   id = @db_connect.exec('SELECT MAX(id) FROM memos')[0]['max']
 
   redirect "/memos/#{id}"
@@ -57,7 +57,7 @@ patch '/memos/:id' do
   title = protect_xss(params[:title])
   content = protect_xss(params[:content])
 
-  @db_connect.exec "UPDATE memos SET title = '#{title}', content = '#{content}' WHERE id = '#{id}' ;"
+  @db_connect.exec("UPDATE memos SET title = '#{title}', content = '#{content}' WHERE id = '#{id}' ;")
 
   redirect "/memos/#{id}"
 end
@@ -97,7 +97,8 @@ end
 
 def table_exists?(db_connect, table_name)
   result = db_connect.exec("SELECT EXISTS (
-    SELECT 1 FROM information_schema.tables WHERE  table_name = '#{table_name}');")
+    SELECT 1 FROM information_schema.tables WHERE  table_name = '#{table_name}'
+    );")
   result.field_name_type = :symbol
   result[0][:exists] == 't'
 end
