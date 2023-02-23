@@ -72,7 +72,6 @@ get '/memos/:id' do
 end
 
 get '/memos/:id/edit' do
-  
   result = @db_connect.exec("SELECT * FROM memos WHERE id =#{params[:id]};")
   result.field_name_type = :symbol
   @memo = result[0]
