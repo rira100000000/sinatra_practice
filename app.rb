@@ -17,11 +17,11 @@ before do
   @db_connect = PG::Connection.new(host: HOST, port: PORT, dbname: DB_NAME, user: USER, password: PASSWORD)
   @db_connect.set_client_encoding('UTF8')
   if table_exists?(@db_connect, DB_NAME)
-    @db_connect.exec("CREATE TABLE memos (
+    @db_connect.exec('CREATE TABLE memos (
       id serial primary key,
       title varchar(255),
       content text
-    );")
+    );')
   end
 end
 

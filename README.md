@@ -8,6 +8,14 @@ sinatraを使って簡単なメモアプリを作成しました。
 * gem 'webrick'
 * gem 'pg'
 
+# PostgreSQLの設定
+PostgreSQLを使用します。
+以下のDB、ユーザー、ポートを使用します。
+DB名:sinatra_practice
+ユーザ名:postgres
+パスワード:postgres
+使用ポート:5432
+
 # 使い方
 ```bash
 git clone -b sinatra_practice https://github.com/rira100000000/sinatra_practice_db.git
@@ -16,8 +24,7 @@ bundle install
 bundle exec ruby app.rb
 ```
 
-# Note
-作成したメモのデータはdataディレクトリ配下にmemos.csvとして保存されます。<br>
+# アクセス方法
 `bundle exec ruby app.rb`実行後、ブラウザから`http://localhost:4567`にアクセスしてください。
 
 # 作成者
