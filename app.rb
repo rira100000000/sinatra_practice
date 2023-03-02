@@ -61,7 +61,7 @@ patch '/memos/:id' do
 end
 
 get '/memos/:id' do
-  result = @db_connect.exec("SELECT * FROM memos WHERE id =#{params[:id]};")
+  result = @db_connect.exec('SELECT * FROM memos WHERE id = $1', [params[:id]])
   result.field_name_type = :symbol
   @memo = result[0]
 
@@ -70,7 +70,7 @@ get '/memos/:id' do
 end
 
 get '/memos/:id/edit' do
-  result = @db_connect.exec("SELECT * FROM memos WHERE id =#{params[:id]};")
+  result = @db_connect.exec('SELECT * FROM memos WHERE id = $1', [params[:id]])
   result.field_name_type = :symbol
   @memo = result[0]
 
@@ -79,7 +79,7 @@ get '/memos/:id/edit' do
 end
 
 delete '/memos/:id' do
-  @db_connect.exec("DELETE FROM memos WHERE id =#{params[:id]};")
+  @db_connect.exec('DELETE FROM memos WHERE id = $1', [params[:id]])
 
   redirect '/memos'
 end
@@ -91,12 +91,4 @@ end
 
 def protect_xss(text)
   Rack::Utils.escape_html(text)
-end
-
-def table_exists?(db_connect, table_name)
-  result = db_connect.exec("SELECT EXISTS (
-    SELECT 1 FROM information_schema.tables WHERE table_name = '#{table_name}'
-    );")
-  result.field_name_type = :symbol
-  result[0][:exists] == 't'
 end
