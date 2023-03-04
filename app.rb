@@ -3,26 +3,29 @@
 require 'sinatra'
 require 'sinatra/reloader'
 require 'csv'
+require 'pg'
 
 set :strict_paths, false
 
-DATA_DIR = File.join(Dir.pwd, 'data')
-CSV_PATH = File.join(DATA_DIR, 'memos.csv')
-MAX_ID_PATH = File.join(DATA_DIR, 'max_id.txt')
+DB_NAME = 'sinatra_practice'
+HOST = 'localhost'
+USER = 'postgres'
+PASSWORD = 'postgres'
+PORT = 5432
 
 before do
-  Dir.mkdir(DATA_DIR) unless Dir.exist?(DATA_DIR)
-  prepare_max_id_file
-  prepare_data_file
+  @db_connect = PG::Connection.new(host: HOST, port: PORT, dbname: DB_NAME, user: USER, password: PASSWORD)
+  @db_connect.set_client_encoding('UTF8')
+  @db_connect.exec('CREATE TABLE IF NOT EXISTS memos (
+    id serial primary key,
+    title varchar(255),
+    content text
+  );')
 end
 
 get '/memos' do
-  @memos = []
-  CSV.open(CSV_PATH, headers: true, header_converters: :symbol) do |csv|
-    csv.each do |memo|
-      @memos << { id: memo[:id], title: memo[:title] }
-    end
-  end
+  @result = @db_connect.exec('SELECT id, title FROM memos')
+  @result.field_name_type = :symbol
 
   @page_title = 'メモ一覧'
   erb :memos
@@ -38,14 +41,13 @@ get '/memos/new' do
 end
 
 post '/memos' do
-  id = File.read(MAX_ID_PATH).to_i + 1
   title = protect_xss(params[:title])
   content = protect_xss(params[:content])
+  @db_connect.exec_params('INSERT INTO memos(title, content) VALUES($1, $2)', [title, content])
+  result = @db_connect.exec('SELECT MAX(id) FROM memos')
+  result.field_name_type = :symbol
 
-  CSV.open(CSV_PATH, 'a', quote_char: '"') { |csv| csv << [id, title, content] }
-  File.open(MAX_ID_PATH, 'w') { |file| file << id }
-
-  redirect "/memos/#{id}"
+  redirect "/memos/#{result[0][:max]}"
 end
 
 patch '/memos/:id' do
@@ -53,44 +55,31 @@ patch '/memos/:id' do
   title = protect_xss(params[:title])
   content = protect_xss(params[:content])
 
-  table = CSV.table(CSV_PATH)
-  index = table.find_index { |row| row[:id] == id }
-  table[index] = [id.to_s, title, content]
-
-  CSV.open(CSV_PATH, 'w') do |memo|
-    memo << table.headers
-    table.each do |row|
-      memo << row
-    end
-  end
+  @db_connect.exec_params('UPDATE memos SET title = $1, content = $2 WHERE id = $3', [title, content, id])
 
   redirect "/memos/#{id}"
 end
 
 get '/memos/:id' do
-  @memo = fetch_memo(params[:id])
+  result = @db_connect.exec('SELECT * FROM memos WHERE id = $1', [params[:id]])
+  result.field_name_type = :symbol
+  @memo = result[0]
 
   @page_title = @memo[:title]
   erb :show
 end
 
 get '/memos/:id/edit' do
-  @memo = fetch_memo(params[:id])
+  result = @db_connect.exec('SELECT * FROM memos WHERE id = $1', [params[:id]])
+  result.field_name_type = :symbol
+  @memo = result[0]
 
   @page_title = "#{@memo[:title]}-編集"
   erb :edit
 end
 
 delete '/memos/:id' do
-  fetched_memo = fetch_memo(params[:id])
-  table = CSV.table(CSV_PATH).delete_if { |row| row[:id].to_i == fetched_memo[:id].to_i }
-
-  CSV.open(CSV_PATH, 'w') do |memo|
-    memo << table.headers
-    table.each do |row|
-      memo << row
-    end
-  end
+  @db_connect.exec('DELETE FROM memos WHERE id = $1', [params[:id]])
 
   redirect '/memos'
 end
@@ -100,26 +89,6 @@ not_found do
   '404 お探しのページは存在しません'
 end
 
-def fetch_memo(id)
-  CSV.open(CSV_PATH, headers: true, header_converters: :symbol) do |csv|
-    csv.find do |memo|
-      memo[:id] == id
-    end
-  end
-end
-
 def protect_xss(text)
   Rack::Utils.escape_html(text)
-end
-
-def prepare_max_id_file
-  return if File.exist?(MAX_ID_PATH)
-
-  File.open(MAX_ID_PATH, 'w') { |file| file.puts(0) }
-end
-
-def prepare_data_file
-  return if File.exist?(CSV_PATH)
-
-  CSV.open(CSV_PATH, 'w') { |csv| csv << %w[id title content] }
 end
